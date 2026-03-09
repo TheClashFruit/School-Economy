@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Collections.Immutable;
+using System.Globalization;
 using Economy.Serializables;
 using Economy.Util;
 
@@ -84,5 +85,40 @@ class Program {
         Console.WriteLine($"  Év: {smallestInflation.Year.Year}");
         Console.WriteLine($"  Infláció: {smallestInflation.GdpGrowth}%");
         Console.WriteLine();
+
+        var avgInflation = _data
+            .GroupBy(d => d.CountryName)
+            .Select(d => new AverageInflation() {
+                CountryName = d.Key,
+                AverageInflationRate = d.Average(dd => dd.Inflation),
+            })
+            .OrderByDescending(a => a.AverageInflationRate)
+            .ToArray();
+        
+        Console.WriteLine("═══════════════════════════════════════════════════════════");
+        Console.WriteLine("ÁTLAGOS ÉVES INFLÁCIÓ (2019-2025)");
+        Console.WriteLine("═══════════════════════════════════════════════════════════");
+        Console.WriteLine();
+        foreach (var t in avgInflation) {
+            Console.WriteLine($"{t.CountryName}: Átlagos infláció: {Math.Round(t.AverageInflationRate, 2)}%");
+        }
+        Console.WriteLine();
+        
+        var euGdpAvg =  _data
+            .GroupBy(d => d.Year)
+            .Select(d => (d.Key.Year, d.Average(dd => dd.GdpGrowth)))
+            .OrderBy(a => a.Item1)
+            .Select(a => (a.Item1.ToString(), Math.Round(a.Item2, 2)))
+            .ToArray();
+        
+        Console.WriteLine("═══════════════════════════════════════════════════════════");
+        Console.WriteLine("EU ÁTLAGOS GDP NÖVEKEDÉS ÉVENKÉNT");
+        Console.WriteLine("═══════════════════════════════════════════════════════════");
+        Console.WriteLine();
+        Console.WriteLine("Év\tGDP növekedés (%)");
+        Console.WriteLine("────────────────────────────────");
+        foreach (var t in euGdpAvg) {
+            Console.WriteLine($"{t.Item1}\t{t.Item2}");
+        }
     }
 }
