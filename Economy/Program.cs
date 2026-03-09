@@ -120,5 +120,24 @@ class Program {
         foreach (var t in euGdpAvg) {
             Console.WriteLine($"{t.Item1}\t{t.Item2}");
         }
+        Console.WriteLine();
+
+        Console.Write("Kérjük, adja meg egy ország nevét: ");
+        var name = Console.ReadLine();
+
+        try {
+            var c = avgInflation.First(d =>
+                string.Equals(d.CountryName, name, StringComparison.InvariantCultureIgnoreCase));
+
+            Console.WriteLine("═══════════════════════════════════════════════════════════");
+            Console.WriteLine("ORSZÁG INFLÁCIÓ STATISZTIKA");
+            Console.WriteLine("═══════════════════════════════════════════════════════════");
+            Console.WriteLine();
+            Console.WriteLine($"Ország: {c.CountryName}");
+            Console.WriteLine($"Átlagos infláció: {Math.Round(c.AverageInflationRate, 2)}%");
+        }
+        catch (InvalidOperationException) {
+            Console.WriteLine($"A(z) '{name}' ország nem található az adatbázisban.");
+        }
     }
 }
